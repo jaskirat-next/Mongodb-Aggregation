@@ -351,4 +351,27 @@ export const notPlacedOrder = async (req, res) => {
         })
     }
 }
+// List all orders where any product has quantity > 1
 
+export const quantity = async (req, res) => {
+    try{
+        const order = await OrderModel.aggregate([
+            {$match: {
+                "items.quantity": {$gt: 1}
+            }},
+            {
+                $project: {
+                    _id: 0,
+                    userId: 1,
+                    items: 1,
+                    totalAmount: 1
+                }
+            }
+        ])
+        res.status(200).json(order)
+    }catch (err) {
+        res.status(500).json({
+            msg: "internal error"
+        })
+    }
+}
