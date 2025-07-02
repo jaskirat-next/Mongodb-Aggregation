@@ -1,6 +1,7 @@
 import {OrderModel} from "../models/orderModel.js";
 import { ProductModel } from "../models/productModel.js";
 import { ReviewModel } from "../models/reviewModel.js";
+import { User } from "../models/userModel.js";
 
 export const createOrder = async (req, res) => {
     try{
@@ -282,3 +283,72 @@ export const mostRevenue = async (req, res) => {
         })
     }
 }
+
+
+//   . Top 3 cities by total number of orders
+
+export const cityOrders = async (req, res) => {
+    try{
+        const order = await OrderModel.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            {$unwind: "$user"},
+            {
+                $group: {
+                    _id: "$user.city",
+                    totalOrders: {$sum: 1}
+                }
+            },
+            {$sort: {totalOrders: -1}},
+            {$limit: 3}
+           
+        ])
+        res.status(200).json(order)
+    } catch (err) {
+        res.status(500).json({
+            msg: "internal error"
+        })
+    }
+}
+
+
+//  13. Find all users who haven't placed any orders
+
+export const notPlacedOrder = async (req, res) => {
+    try{
+        const user = await User.aggregate([
+            {
+                $lookup: {
+                    from: "ordermodels",
+                    localField: "_id",
+                    foreignField: "userId",
+                    as: "userOrders"
+                }
+            },
+            {
+                $match: {
+                    userOrders: {$eq: []}
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    email: 1
+                }
+            }
+        ])
+
+        res.status(200).json(user)
+    } catch (err) {
+        res.status(500).json({
+            msg: "internal error"
+        })
+    }
+}
+
