@@ -1,6 +1,6 @@
 import express from "express";
 import { createUser } from "../controllers/userController.js";
-import { averageRating, createOrder, hightCategoryPrice, listOfProductInOrder, noOfOrders, orderAndAmountSpend, OrderStatus, reviewsAndRaiting, totalSpend, userNameAndTotalamount } from "../controllers/orderController.js";
+import { averageRating, createOrder, hightCategoryPrice, listOfProductInOrder, mostRevenue, noOfOrders, orderAndAmountSpend, OrderStatus, reviewsAndRaiting, totalSpend, userNameAndTotalamount } from "../controllers/orderController.js";
 import { createProduct } from "../controllers/productController.js";
 import { createReview } from "../controllers/reviewController.js";
 
@@ -19,9 +19,12 @@ router.get('/averageRating', averageRating)
 router.get('/hightCategoryPrice', hightCategoryPrice)
 router.get('/orderAndAmountSpend', orderAndAmountSpend)
 router.get('/reviewsAndRaiting', reviewsAndRaiting)
+router.get('/mostRevenue', mostRevenue)
 
 
 
 
 
 export default router;
+
+

@@ -210,9 +210,30 @@ export const  reviewsAndRaiting = async (req, res) => {
             {
                 $group: {
                     _id: "$productId",
+                    reviewCount: {$sum: 1},
+                    avgRaiting: {$avg: "$rating"}
 
                 }
-            }
+            },
+            {
+                $lookup: {
+                    from: "productmodels",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "product"
+                }
+            },
+            {$unwind: "$product"},
+            {
+                $project: {
+                    _id: 0,
+                    projectName: "$product.name",
+                    category: "$product.category",
+                    reviewCount: 1,
+                    avgRaiting: 1
+                }
+            },
+            {$sort: {avgRaiting: -1}}
         ])
 
         res.status(200).json(review)
@@ -224,3 +245,40 @@ export const  reviewsAndRaiting = async (req, res) => {
 }
 
 
+// Which product generated the most revenue across all orders?
+
+export const mostRevenue = async (req, res) => {
+    try{
+        const revenue = await OrderModel.aggregate([
+            {$unwind: "$items"},
+            {
+                $group: {
+                    _id: "$items.productId",
+                    revenue: {$sum: { $multiply: ["$items.quantity", "$items.price"]}}
+                }
+            },
+            {
+                $lookup: {
+                    from: "productmodels",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "product"
+                }
+            },
+            {$unwind: "$product"},
+            {$project: {
+                _id: 0,
+                productName: "$product.name",
+                revenue: 1
+            }},
+            {$sort: {revenue: -1}},
+            {$limit: 1}
+        ])
+
+        res.status(200).json(revenue)
+    } catch (err) {
+        res.status(500).json({
+            msg: "internal error"
+        })
+    }
+}
