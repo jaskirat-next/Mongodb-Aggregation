@@ -331,6 +331,7 @@ export const notPlacedOrder = async (req, res) => {
                     as: "userOrders"
                 }
             },
+            
             {
                 $match: {
                     userOrders: {$eq: []}
@@ -356,6 +357,7 @@ export const notPlacedOrder = async (req, res) => {
 export const quantity = async (req, res) => {
     try{
         const order = await OrderModel.aggregate([
+            {$unwind: "$items"},
             {$match: {
                 "items.quantity": {$gt: 1}
             }},
@@ -367,6 +369,47 @@ export const quantity = async (req, res) => {
                     totalAmount: 1
                 }
             }
+        ])
+        res.status(200).json(order)
+    }catch (err) {
+        res.status(500).json({
+            msg: "internal error"
+        })
+    }
+}
+
+// Top 3 users who spent the most
+
+export const spentMost = async (req, res) => {
+    try{
+        const order = await OrderModel.aggregate([
+            {
+                $group: {
+                    _id: "$userId",
+                    totalAmount: {$sum: "$totalAmount"}
+
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            {$unwind: "$user"},
+            {
+                $project: {
+                    _id: 0,
+                    Name: "$user.name",
+                    email: "$user.email",
+                    totalAmount: 1
+                }
+            },
+            {$sort: {totalAmount: -1}},
+            {$limit: 2}
+
         ])
         res.status(200).json(order)
     }catch (err) {
