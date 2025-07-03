@@ -1,6 +1,6 @@
 import express from "express";
 import { createUser } from "../controllers/userController.js";
-import { averageRating, cityOrders, createOrder, hightCategoryPrice, listOfProductInOrder, mostRevenue, noOfOrders, notPlacedOrder, orderAndAmountSpend, OrderStatus, quantity, reviewsAndRaiting, spentMost, totalSpend, userNameAndTotalamount } from "../controllers/orderController.js";
+import { averageRating, cityOrders, createOrder, hightCategoryPrice, listOfProductInOrder, mostRevenue, noOfOrders, notPlacedOrder, orderAndAmountSpend, OrderStatus, quantity, reviewsAndRaiting, spentMost, totalSaleAndRevenue, totalSpend, userNameAndTotalamount } from "../controllers/orderController.js";
 import { createProduct } from "../controllers/productController.js";
 import { createReview } from "../controllers/reviewController.js";
 
@@ -23,6 +23,7 @@ router.get('/mostRevenue', mostRevenue)
 router.get('/cityOrders', cityOrders)
 router.get('/notPlacedOrder', notPlacedOrder)
 router.get('/spentMost', spentMost)
+router.get('/totalSaleAndRevenue', totalSaleAndRevenue)
 
 
 

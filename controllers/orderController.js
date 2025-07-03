@@ -418,3 +418,57 @@ export const spentMost = async (req, res) => {
         })
     }
 }
+
+// List each product with total units sold + total revenue
+
+export const totalSaleAndRevenue = async (req, res) => {
+    try{
+        const total = await OrderModel.aggregate([
+            {$unwind: "$items"},
+            {
+                $group: {
+                    _id: "$items.productId",
+                    totalUnitSold: {$sum: "$items.quantity"},
+                    totalRevenue: {$sum: {$multiply: ["$items.quantity", "$items.price"]}}
+                }
+            },
+            {
+                $lookup: {
+                    from: "productmodels",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "product"
+                }
+            },
+            {$unwind: "$product"},
+            {
+                $project: {
+                    productName: "$product.name",
+                    category: "$product.category",
+                    totalUnitSold: 1,
+                    totalRevenue: 1
+                }
+            },
+            { $sort: { totalRevenue: -1 } }
+
+
+        ])
+        res.status(200).json(total)
+    } catch (err) {
+        res.status(500).json({
+            msg: "internal error"
+        })
+    }
+}
+
+//  Full product report (joins + totals + reviews)
+
+export const productReport = async (req, res) => {
+    try{
+        const product = await
+    } catch (err) {
+        res.status(500).json({
+            msg: "internal error"
+        })
+    }
+}
